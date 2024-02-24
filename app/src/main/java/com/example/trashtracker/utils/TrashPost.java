@@ -4,23 +4,23 @@ import com.google.firebase.database.Exclude;
 
 import java.util.Date;
 
-public class TrashPlace extends Uid{
-
+public class TrashPost extends Uid{
     private String title;
     private String location;
-    private Date date;
+    private User user;
     private String imagePath;
     private String imageUrl;
-    private String userUid;
-    private String userPhone;
+    private Date createdDate;
 
-    public TrashPlace() {}
+    public TrashPost() {
+        this.createdDate = new Date();
+    }
 
     public String getTitle() {
         return title;
     }
 
-    public TrashPlace setTitle(String title) {
+    public TrashPost setTitle(String title) {
         this.title = title;
         return this;
     }
@@ -29,25 +29,24 @@ public class TrashPlace extends Uid{
         return location;
     }
 
-    public TrashPlace setLocation(String location) {
+    public TrashPost setLocation(String location) {
         this.location = location;
         return this;
     }
 
-    public Date getDate() {
-        return date;
-    }
-
-    public TrashPlace setDate(Date date) {
-        this.date = date;
+    public TrashPost setUser(User user){
+        this.user = user;
         return this;
     }
 
+    public User getUser(){
+        return this.user;
+    }
     public String getImagePath() {
         return imagePath;
     }
 
-    public TrashPlace setImagePath(String imagePath) {
+    public TrashPost setImagePath(String imagePath) {
         this.imagePath = imagePath;
         return this;
     }
@@ -56,26 +55,17 @@ public class TrashPlace extends Uid{
         return imageUrl;
     }
 
-    public TrashPlace setImageUrl(String imageUrl) {
+    public TrashPost setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
         return this;
     }
 
-    public String getUserUid() {
-        return userUid;
+    public Date getCreatedDate() {
+        return createdDate;
     }
 
-    public TrashPlace setUserUid(String userUid) {
-        this.userUid = userUid;
-        return this;
-    }
-
-    public String getUserPhone() {
-        return userPhone;
-    }
-
-    public TrashPlace setUserPhone(String userPhone) {
-        this.userPhone = userPhone;
+    public TrashPost setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
         return this;
     }
 }

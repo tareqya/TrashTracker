@@ -13,6 +13,9 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 import com.example.trashtracker.R;
+import com.example.trashtracker.interfaces.AuthCallBack;
+import com.example.trashtracker.utils.Database;
+import com.example.trashtracker.utils.User;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 
@@ -22,6 +25,7 @@ public class HomeActivity extends AppCompatActivity {
     private AddFragment addFragment;
     private BottomNavigationView bottom_navigation;
     private FrameLayout homeFrame, profileFrame, addFrame;
+    private Database database;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +35,31 @@ public class HomeActivity extends AppCompatActivity {
         askPermissions();
         findViews();
         initViews();
+        database = new Database();
+        database.setAuthCallBack(new AuthCallBack() {
+            @Override
+            public void onCreateAccountComplete(boolean status, String msg) {
 
+            }
+
+            @Override
+            public void updateUserInfoComplete(boolean status, String msg) {
+
+            }
+
+            @Override
+            public void onLoginComplete(boolean status, String msg) {
+
+            }
+
+            @Override
+            public void fetchUserInfoComplete(User user) {
+                addFragment.setUser(user);
+                profileFragment.setUser(user);
+            }
+        });
+
+        database.getUserInfo(database.getCurrentUser().getUid());
         bottom_navigation.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
