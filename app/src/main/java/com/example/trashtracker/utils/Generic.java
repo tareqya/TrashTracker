@@ -8,9 +8,13 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.webkit.MimeTypeMap;
 
 import java.io.ByteArrayOutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.Random;
 
@@ -34,31 +38,10 @@ public class Generic {
     }
 
     public static void openLocation(Context context, String locationName) {
-        // Check if Google Maps is installed
-//        if (!isGoogleMapsInstalled(context)) {
-//            Toast.makeText(context, "Please install Google Maps to use this feature.", Toast.LENGTH_LONG).show();
-//            return;
-//        }
-
-        // Encode location name for URL safety
-        String encodedLocationName = Uri.encode(locationName);
-
-        // Build Google Maps URL with user's preferred language
-        String language = Locale.getDefault().getLanguage();
-        String googleMapsUrl = "https://www.google.com/maps/search/?q=" + encodedLocationName + "&language=" + language;
-
+        // Create a Uri object with the location name
+        Uri gmmIntentUri = Uri.parse("geo:0,0?q=" + Uri.encode(locationName));
         // Open Google Maps app using implicit intent
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(googleMapsUrl));
+        Intent intent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
         context.startActivity(intent);
-    }
-
-    private static boolean isGoogleMapsInstalled(Context context) {
-        PackageManager pm = context.getPackageManager();
-        try {
-            pm.getPackageInfo("com.google.android.apps.maps", PackageManager.GET_ACTIVITIES);
-            return true;
-        } catch (PackageManager.NameNotFoundException e) {
-            return false;
-        }
     }
 }

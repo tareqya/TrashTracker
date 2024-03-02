@@ -10,6 +10,9 @@ public class User extends Uid implements Serializable {
     private String email;
     private String password;
     private int score;
+    private String imagePath;
+    private String imageUrl;
+
 
     public User(String name, String phone, String email, String password, int score) {
         this.name = name;
@@ -69,4 +72,21 @@ public class User extends Uid implements Serializable {
         return score;
     }
 
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public User setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+        return this;
+    }
+    @Exclude
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public User setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+        return this;
+    }
 }

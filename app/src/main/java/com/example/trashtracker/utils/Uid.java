@@ -2,7 +2,9 @@ package com.example.trashtracker.utils;
 
 import com.google.firebase.database.Exclude;
 
-public class Uid {
+import java.io.Serializable;
+
+public class Uid implements Serializable {
     private String uid;
     public Uid(){}
 

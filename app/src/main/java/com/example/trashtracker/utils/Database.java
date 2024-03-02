@@ -100,9 +100,13 @@ public class Database {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 User user = snapshot.getValue(User.class);
-                if(user != null)
+                if(user != null){
                     user.setUid(uid);
-
+                    if(user.getImagePath() != null){
+                        String imageUrl = downloadImageUrl(user.getImagePath());
+                        user.setImageUrl(imageUrl);
+                    }
+                }
                 authCallBack.fetchUserInfoComplete(user);
             }
 
