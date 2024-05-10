@@ -41,12 +41,12 @@ public class TrashPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         TrashPostViewHolder trashPostViewHolder = (TrashPostViewHolder) holder;
         TrashPost trashPost = getItem(position);
-
-        trashPostViewHolder.trash_TV_name.setText(trashPost.getUser().getName());
-        trashPostViewHolder.trash_TV_date.setText(trashPost.getCreatedDate().toLocaleString());
-        Glide.with(context).load(trashPost.getImageUrl()).into(trashPostViewHolder.trash_IV_postImage);
-        trashPostViewHolder.trash_TV_Title.setText(trashPost.getTitle());
-
+        if(trashPost.getUser() != null){
+            trashPostViewHolder.trash_TV_name.setText(trashPost.getUser().getName());
+            trashPostViewHolder.trash_TV_date.setText(trashPost.getCreatedDate().toLocaleString());
+            Glide.with(context).load(trashPost.getImageUrl()).into(trashPostViewHolder.trash_IV_postImage);
+            trashPostViewHolder.trash_TV_Title.setText(trashPost.getTitle());
+        }
     }
 
     public TrashPost getItem(int pos){

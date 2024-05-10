@@ -5,8 +5,11 @@ import android.net.Uri;
 import androidx.annotation.NonNull;
 
 import com.example.trashtracker.interfaces.AuthCallBack;
+import com.example.trashtracker.interfaces.ImageUrlDownloadListener;
 import com.example.trashtracker.interfaces.TrashCallBack;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -19,6 +22,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Database {
     public static final String USERS_TABLE = "Users";
@@ -103,11 +107,24 @@ public class Database {
                 if(user != null){
                     user.setUid(uid);
                     if(user.getImagePath() != null){
-                        String imageUrl = downloadImageUrl(user.getImagePath());
-                        user.setImageUrl(imageUrl);
+                        downloadImageUrl(user.getImagePath(), new ImageUrlDownloadListener() {
+                            @Override
+                            public void onImageUrlDownloaded(String imageUrl) {
+                                user.setImageUrl(imageUrl);
+                                authCallBack.fetchUserInfoComplete(user);
+                            }
+
+                            @Override
+                            public void onImageUrlDownloadFailed(String errorMessage) {
+
+                            }
+                        });
+
+                    }else {
+                        authCallBack.fetchUserInfoComplete(user);
                     }
                 }
-                authCallBack.fetchUserInfoComplete(user);
+
             }
 
             @Override
@@ -117,10 +134,20 @@ public class Database {
         });
     }
 
-    public String downloadImageUrl(String imagePath){
-        Task<Uri> downloadImageTask = mStorage.getReference().child(imagePath).getDownloadUrl();
-        while (!downloadImageTask.isComplete() && !downloadImageTask.isCanceled());
-        return downloadImageTask.getResult().toString();
+    public void downloadImageUrl(String imagePath, ImageUrlDownloadListener listener){
+        this.mStorage.getReference().child(imagePath).getDownloadUrl()
+                .addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        listener.onImageUrlDownloaded(uri.toString());
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        listener.onImageUrlDownloadFailed(e.getMessage());
+                    }
+                });
     }
 
     public boolean uploadImage(Uri imageUri, String imagePath){
@@ -149,15 +176,26 @@ public class Database {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 ArrayList<TrashPost> trashPosts = new ArrayList<>();
+
+                AtomicInteger count = new AtomicInteger((int)snapshot.getChildrenCount() - 1);
                 for(DataSnapshot data : snapshot.getChildren()){
                     TrashPost trashPost = data.getValue(TrashPost.class);
                     trashPost.setUid(data.getKey());
-                    String imageUrl = downloadImageUrl(trashPost.getImagePath());
-                    trashPost.setImageUrl(imageUrl);
-                    trashPosts.add(trashPost);
-                }
+                    downloadImageUrl(trashPost.getImagePath(), new ImageUrlDownloadListener() {
+                        @Override
+                        public void onImageUrlDownloaded(String imageUrl) {
+                            trashPost.setImageUrl(imageUrl);
+                            trashPosts.add(trashPost);
+                            if(count.getAndDecrement() == 0)
+                                trashCallBack.onFetchTrashPostsComplete(trashPosts);
+                        }
 
-                trashCallBack.onFetchTrashPostsComplete(trashPosts);
+                        @Override
+                        public void onImageUrlDownloadFailed(String errorMessage) {
+
+                        }
+                    });
+                }
             }
 
             @Override
